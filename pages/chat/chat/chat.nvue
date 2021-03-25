@@ -1,77 +1,72 @@
 <template>
 	<div>
 		<!-- 导航栏 -->
-		<free-nav-bar title="HHH博客" :noreadnum='1' :fixed="true" showBack>
-			<free-icon-button slot='right' :icon="'\ue6fd'"></free-icon-button>
-		</free-nav-bar>
+		<free-nav-bar title="HHH博客" :noreadnum="1" :fixed="true" showBack><free-icon-button slot="right" :icon="'\ue6fd'"></free-icon-button></free-nav-bar>
 		<!-- 聊天内容区域 -->
-		<scroll-view scroll-y="true" class="bg-light position-fixed left-0 right-0 px-3" style="bottom: 105rpx;" :style="'top:'+ navBarHeight+'px'">
+		<scroll-view scroll-y="true" class="bg-light position-fixed left-0 right-0 px-3" style="bottom: 105rpx;" :style="'top:' + navBarHeight + 'px'">
 			<!-- 聊天信息列表组件 -->
-			<view class="flex align-start justify-start position-relative mb-3">
-				<free-avater size="70" src="/static/images/mail/friend.png"></free-avater>
-				<text class="iconfont text-white font-md position-absolute chat-left-icon" >&#xe609;</text>
-				<div class="bg-white p-2 rounded ml-3" style="max-width:500rpx">
-					<text class="font-md">你好,ヽ(*^ｰ^)人(^ｰ^*)ノ你好,ヽ(*^ｰ^)人(^ｰ^*)ノ你好,ヽ(*^ｰ^)人(^ｰ^*)ノ你好,ヽ(*^ｰ^)人(^ｰ^*)ノ</text>
-				</div>
-			</view>
-			<view class="flex align-start justify-end position-relative mb-3">
-				<div class="bg-white bg-chat-item p-2 rounded mr-3" style="max-width:500rpx">
-					<text class="font-md">你好,ヽ(*^ｰ^)人(^ｰ^*)ノ你好,ヽ(*^ｰ^)人(^ｰ^*)ノ你好,ヽ(*^ｰ^)人(^ｰ^*)ノ你好,ヽ(*^ｰ^)人(^ｰ^*)ノ</text>
-				</div>
-				<text class="iconfont text-chat-item font-md position-absolute chat-right-icon" >&#xe640;</text>
-				<free-avater size="70" src="/static/images/mail/friend.png"></free-avater>
-			</view>
+			<block v-for="(item, index) in list" :key="index">
+				<free-chat-item :item='item' :index="index"></free-chat-item>
+				</block>
 		</scroll-view>
 		<!-- 底部输入框 -->
 		<view class="position-fixed left-0 right-0 bottom-0 border-top flex align-center " style="background-color: #f7f7f6;height: 105rpx;">
 			<free-icon-button :icon="'\ue606'"></free-icon-button>
-			<view class="flex-1">
-				<textarea fixed class=" bg-white rounded p-2" style="height: 80rpx; width: auto;" />
-				</view>
-				<free-icon-button :icon="'\ue605'"></free-icon-button>
-				<free-icon-button :icon="'\ue603'"></free-icon-button>
+			<view class="flex-1"><textarea fixed class=" bg-white rounded p-2" style="height: 80rpx; width: auto;" /></view>
+			<free-icon-button :icon="'\ue605'"></free-icon-button>
+			<free-icon-button :icon="'\ue603'"></free-icon-button>
 		</view>
 	</div>
 </template>
 
 <script>
-	import freeNavBar from '@/components/free-ui/free-nav-bar.vue'
-	import freeIconButton from '@/components/free-ui/free-icon-button.vue'
-	import freeAvater from "@/components/free-ui/free-avater.vue"
-	export default {
-		components: {
-			freeNavBar,
-			freeIconButton,
-			freeAvater
-		},
-		data(){
-			return{
-				navBarHeight:0,
-				statusBarHeight:0,
-			}
-		},
-		mounted() {
-			// #ifdef APP-PLUS-NVUE
-			this.statusBarHeight = plus.navigator.getStatusbarHeight();
-			// #endif
-			this.navBarHeight = this.statusBarHeight + uni.upx2px(90);
-			console.log('this.statusBarHeight', this.statusBarHeight);
-			console.log('this.navBarHeight', this.navBarHeight);
-		},
+import freeNavBar from '@/components/free-ui/free-nav-bar.vue';
+import freeIconButton from '@/components/free-ui/free-icon-button.vue';
+import freeChatItem from '@/components/free-ui/free-chat-item.vue';
+export default {
+	components: {
+		freeNavBar,
+		freeIconButton,
+		freeChatItem
+	},
+	data() {
+		return {
+			navBarHeight: 0,
+			statusBarHeight: 0,
+			list: [
+				{
+					avatar: '/static/images/mail/friend.png',
+					user_id: 1,
+					nickname: '昵称',
+					type: 'text', //image,audio,video,file,share
+					data: '你好,ヽ(*^ｰ^)人(^ｰ^*)ノ你好,ヽ(*^ｰ^)人(^ｰ^*)ノ你好,ヽ(*^ｰ^)人(^ｰ^*)ノ你好,ヽ(*^ｰ^)人(^ｰ^*)ノ'
+				},
+				{
+					avatar: '/static/images/mail/friend.png',
+					user_id: 2,
+					nickname: '昵称',
+					type: 'text', //image,audio,video,file,share
+					data: '你好,ヽ(*^ｰ^)人(^ｰ^*)ノ你好,ヽ(*^ｰ^)人(^ｰ^*)ノ你好,ヽ(*^ｰ^)人(^ｰ^*)ノ你好,ヽ(*^ｰ^)人(^ｰ^*)ノ'
+				}
+			]
+		};
+	},
+	mounted() {
+		// #ifdef APP-PLUS-NVUE
+		this.statusBarHeight = plus.navigator.getStatusbarHeight();
+		// #endif
+		this.navBarHeight = this.statusBarHeight + uni.upx2px(90);
+		console.log('this.statusBarHeight', this.statusBarHeight);
+		console.log('this.navBarHeight', this.navBarHeight);
 	}
+};
 </script>
 
 <style>
-	@import '@/common/free.css';
-	@import '@/common/common.css';
-	/* #ifndef APP-PLUS-NVUE */
-	@import '@/common/free-icon.css';
-	/* #endif*/
-	.chat-left-icon{
-		left: 80rpx; top: 20rpx;
-	}
-	.chat-right-icon{
-		right:80rpx;
-		top:20rpx;
-	}
+@import '@/common/free.css';
+@import '@/common/common.css';
+/* #ifndef APP-PLUS-NVUE */
+@import '@/common/free-icon.css';
+/* #endif*/
+
 </style>

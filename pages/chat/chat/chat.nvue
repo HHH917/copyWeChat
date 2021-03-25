@@ -5,12 +5,21 @@
 			<free-icon-button slot='right' :icon="'\ue6fd'"></free-icon-button>
 		</free-nav-bar>
 		<!-- 聊天内容区域 -->
-		<scroll-view scroll-y="true" class=" position-fixed left-0 right-0 px-3" style="bottom: 105rpx;" :style="'top:'+ navBarHeight+'px'">
-			<view class="flex">
+		<scroll-view scroll-y="true" class="bg-light position-fixed left-0 right-0 px-3" style="bottom: 105rpx;" :style="'top:'+ navBarHeight+'px'">
+			<!-- 聊天信息列表组件 -->
+			<view class="flex align-start justify-start position-relative mb-3">
 				<free-avater size="70" src="/static/images/mail/friend.png"></free-avater>
+				<text class="iconfont text-white font-md position-absolute chat-left-icon" >&#xe609;</text>
 				<div class="bg-white p-2 rounded ml-3" style="max-width:500rpx">
-					<text class="font-md">你好</text>
+					<text class="font-md">你好,ヽ(*^ｰ^)人(^ｰ^*)ノ你好,ヽ(*^ｰ^)人(^ｰ^*)ノ你好,ヽ(*^ｰ^)人(^ｰ^*)ノ你好,ヽ(*^ｰ^)人(^ｰ^*)ノ</text>
 				</div>
+			</view>
+			<view class="flex align-start justify-end position-relative mb-3">
+				<div class="bg-white bg-chat-item p-2 rounded mr-3" style="max-width:500rpx">
+					<text class="font-md">你好,ヽ(*^ｰ^)人(^ｰ^*)ノ你好,ヽ(*^ｰ^)人(^ｰ^*)ノ你好,ヽ(*^ｰ^)人(^ｰ^*)ノ你好,ヽ(*^ｰ^)人(^ｰ^*)ノ</text>
+				</div>
+				<text class="iconfont text-chat-item font-md position-absolute chat-right-icon" >&#xe640;</text>
+				<free-avater size="70" src="/static/images/mail/friend.png"></free-avater>
 			</view>
 		</scroll-view>
 		<!-- 底部输入框 -->
@@ -58,4 +67,11 @@
 	/* #ifndef APP-PLUS-NVUE */
 	@import '@/common/free-icon.css';
 	/* #endif*/
+	.chat-left-icon{
+		left: 80rpx; top: 20rpx;
+	}
+	.chat-right-icon{
+		right:80rpx;
+		top:20rpx;
+	}
 </style>

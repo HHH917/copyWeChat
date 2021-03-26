@@ -1,77 +1,183 @@
 <template>
 	<div>
 		<!-- 导航栏 -->
-		<free-nav-bar title="HHH博客" :noreadnum='1' :fixed="true" showBack>
-			<free-icon-button slot='right' :icon="'\ue6fd'"></free-icon-button>
+		<free-nav-bar title="HHH博客" :noreadnum="1" :fixed="true" showBack>
+			<free-icon-button slot="right" :icon="'\ue6fd'"></free-icon-button>
 		</free-nav-bar>
 		<!-- 聊天内容区域 -->
-		<scroll-view scroll-y="true" class="bg-light position-fixed left-0 right-0 px-3" style="bottom: 105rpx;" :style="'top:'+ navBarHeight+'px'">
+		<scroll-view scroll-y="true" class="bg-light position-fixed left-0 right-0 px-3" style="bottom: 105rpx;" :style="'top:' + navBarHeight + 'px'">
 			<!-- 聊天信息列表组件 -->
-			<view class="flex align-start justify-start position-relative mb-3">
-				<free-avater size="70" src="/static/images/mail/friend.png"></free-avater>
-				<text class="iconfont text-white font-md position-absolute chat-left-icon" >&#xe609;</text>
-				<div class="bg-white p-2 rounded ml-3" style="max-width:500rpx">
-					<text class="font-md">你好,ヽ(*^ｰ^)人(^ｰ^*)ノ你好,ヽ(*^ｰ^)人(^ｰ^*)ノ你好,ヽ(*^ｰ^)人(^ｰ^*)ノ你好,ヽ(*^ｰ^)人(^ｰ^*)ノ</text>
-				</div>
-			</view>
-			<view class="flex align-start justify-end position-relative mb-3">
-				<div class="bg-white bg-chat-item p-2 rounded mr-3" style="max-width:500rpx">
-					<text class="font-md">你好,ヽ(*^ｰ^)人(^ｰ^*)ノ你好,ヽ(*^ｰ^)人(^ｰ^*)ノ你好,ヽ(*^ｰ^)人(^ｰ^*)ノ你好,ヽ(*^ｰ^)人(^ｰ^*)ノ</text>
-				</div>
-				<text class="iconfont text-chat-item font-md position-absolute chat-right-icon" >&#xe640;</text>
-				<free-avater size="70" src="/static/images/mail/friend.png"></free-avater>
-			</view>
+			<block v-for="(item, index) in list" :key="index">
+				<free-chat-item :item='item' :index="index" @long="long" :pretime=" index > 0 ? list[index-1].create_time : 0"></free-chat-item>
+			</block>
 		</scroll-view>
 		<!-- 底部输入框 -->
 		<view class="position-fixed left-0 right-0 bottom-0 border-top flex align-center " style="background-color: #f7f7f6;height: 105rpx;">
 			<free-icon-button :icon="'\ue606'"></free-icon-button>
-			<view class="flex-1">
-				<textarea fixed class=" bg-white rounded p-2" style="height: 80rpx; width: auto;" />
-				</view>
-				<free-icon-button :icon="'\ue605'"></free-icon-button>
-				<free-icon-button :icon="'\ue603'"></free-icon-button>
+			<view class="flex-1"><textarea fixed class=" bg-white rounded p-2" style="height: 80rpx; width: auto;" /></view>
+			<free-icon-button :icon="'\ue605'"></free-icon-button>
+			<free-icon-button :icon="'\ue603'"></free-icon-button>
 		</view>
+		
+		<!-- 弹出层 -->
+		<free-popup ref="extend" :bodyWidth="300" :bodyHeight="getMenusHeight" :tabbarHeight="105">
+			<view class="flex flex-column" style="width: 240rpx;" :style="getMenusStyle">
+				<view 
+				class="flex-1 flex align-center"
+				 hover-class="bg-light"
+				  v-for="(item,index) in menusList"
+				   :key="index"
+				   @click="cl">
+					<text class="font-md pl-3">{{item.name}}</text>
+				</view>
+			</view>
+		</free-popup>
 	</div>
 </template>
 
 <script>
-	import freeNavBar from '@/components/free-ui/free-nav-bar.vue'
-	import freeIconButton from '@/components/free-ui/free-icon-button.vue'
-	import freeAvater from "@/components/free-ui/free-avater.vue"
-	export default {
-		components: {
-			freeNavBar,
-			freeIconButton,
-			freeAvater
+import freeNavBar from '@/components/free-ui/free-nav-bar.vue';
+import freeIconButton from '@/components/free-ui/free-icon-button.vue';
+import freeChatItem from '@/components/free-ui/free-chat-item.vue';
+import freePopup from "@/components/free-ui/free-popup.vue"
+export default {
+	components: {
+		freeNavBar,
+		freeIconButton,
+		freeChatItem,
+		freePopup
+	},
+	data() {
+		return {
+			
+			menus: [{
+				name: "复制",
+				event: ""
+			}, {
+				name: "发送给朋友",
+				event: ""
+			},
+			{
+				name: "收藏",
+				event: ""
+			}, {
+				name: "删除",
+				event: ""
+			},
+			{
+				name: "多选",
+				event: ""
+			}, {
+				name: "撤回",
+				event: "removeChatItem"
+			}],
+			// 当前操作的气泡索引
+			propIndex: -1,
+			navBarHeight: 0,
+			statusBarHeight: 0,
+			list: [
+				{
+					avatar: '/static/images/mail/friend.png',
+					user_id: 1,
+					nickname: '昵称',
+					type: 'text', //image,audio,video,file,share
+					data: '你好,ヽ(*^ｰ^)人(^ｰ^*)ノ你好,ヽ(*^ｰ^)人(^ｰ^*)ノ你好,ヽ(*^ｰ^)人(^ｰ^*)ノ你好,ヽ(*^ｰ^)人(^ｰ^*)ノ',
+					create_time:1616741674,
+					isremove:true,
+				},
+				{
+					avatar: '/static/images/mail/friend.png',
+					user_id: 2,
+					nickname: '昵称',
+					type: 'text', //image,audio,video,file,share
+					data: '你好,ヽ(*^ｰ^)人(^ｰ^*)ノ你好,ヽ(*^ｰ^)人(^ｰ^*)ノ你好,ヽ(*^ｰ^)人(^ｰ^*)ノ你好,ヽ(*^ｰ^)人(^ｰ^*)ノ',
+					create_time:1616742034,
+					isremove:false,
+				},
+				
+				{
+					avatar: '/static/images/mail/friend.png',
+					user_id: 1,
+					nickname: '昵称',
+					type: 'text', //image,audio,video,file,share
+					data: '你好,ヽ(*^ｰ^)人(^ｰ^*)ノ你好,ヽ(*^ｰ^)人(^ｰ^*)ノ你好,ヽ(*^ｰ^)人(^ｰ^*)ノ你好,ヽ(*^ｰ^)人(^ｰ^*)ノ',
+					create_time:1616742034,
+					isremove:false,
+				},
+				
+				{
+					avatar: '/static/images/mail/friend.png',
+					user_id: 2,
+					nickname: '昵称',
+					type: 'text', //image,audio,video,file,share
+					data: '你好,ヽ(*^ｰ^)人(^ｰ^*)ノ你好,ヽ(*^ｰ^)人(^ｰ^*)ノ你好,ヽ(*^ｰ^)人(^ｰ^*)ノ你好,ヽ(*^ｰ^)人(^ｰ^*)ノ',
+					create_time:1616742034,
+					isremove:false,
+				}
+			]
+		};
+	},
+	mounted() {
+		// #ifdef APP-PLUS-NVUE
+		this.statusBarHeight = plus.navigator.getStatusbarHeight();
+		// #endif
+		this.navBarHeight = this.statusBarHeight + uni.upx2px(90);
+		console.log('this.statusBarHeight', this.statusBarHeight);
+		console.log('this.navBarHeight', this.navBarHeight);
+	},
+	computed:{
+		// 动态获取菜单高度
+		getMenusHeight() {
+			let H = 100
+			return this.menus.length * H;
 		},
-		data(){
-			return{
-				navBarHeight:0,
-				statusBarHeight:0,
-			}
+		// 获取菜单的样式
+		getMenusStyle() {
+			return ` height:${this.getMenusHeight}rpx;`
 		},
-		mounted() {
-			// #ifdef APP-PLUS-NVUE
-			this.statusBarHeight = plus.navigator.getStatusbarHeight();
-			// #endif
-			this.navBarHeight = this.statusBarHeight + uni.upx2px(90);
-			console.log('this.statusBarHeight', this.statusBarHeight);
-			console.log('this.navBarHeight', this.navBarHeight);
+		//判断是否操作本人信息
+		isdoSelf() {
+			// 获取本人id (假设拿到了)
+			let id = 1;
+			let user_id  = this.propIndex > -1 ? this.list[this.propIndex].user_id : 0
+			return user_id === id;
 		},
+		// 获取操作菜单
+		menusList(){
+			return this.menus.filter(v=>{
+				if(v.name === '撤回' && !this.isdoSelf){
+					return false;
+				}else{
+					return true;
+				}
+				 
+			})
+		}
+	},
+	methods:{
+		// 长按气泡消息
+		long({
+				x,
+				y,
+				index
+			}){
+		// 初始化 索引
+		this.propIndex = index;
+		// 判断之前是否处于置顶状态
+		let item = this.list[index];
+		this.menus[0].name = item.istop ? '取消置顶' : '设为置顶'
+		
+		this.$refs.extend.show(x, y);
+		}
 	}
+};
 </script>
 
 <style>
-	@import '@/common/free.css';
-	@import '@/common/common.css';
-	/* #ifndef APP-PLUS-NVUE */
-	@import '@/common/free-icon.css';
-	/* #endif*/
-	.chat-left-icon{
-		left: 80rpx; top: 20rpx;
-	}
-	.chat-right-icon{
-		right:80rpx;
-		top:20rpx;
-	}
+@import '@/common/free.css';
+@import '@/common/common.css';
+/* #ifndef APP-PLUS-NVUE */
+@import '@/common/free-icon.css';
+/* #endif*/
+
 </style>

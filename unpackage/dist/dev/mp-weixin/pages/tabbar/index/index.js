@@ -273,10 +273,7 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
     {var x = _ref.x,y = _ref.y,index = _ref.index;
       // 初始化 索引
       this.propIndex = index;
-      // 判断之前是否处于置顶状态
-      var item = this.list[index];
-      this.menus[0].name = item.istop ? '取消置顶' : '设为置顶';
-
+      // 显示扩展菜单
       this.$refs.extend.show(x, y);
     },
     // 分发菜单事件

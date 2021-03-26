@@ -585,5 +585,11 @@ button {
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 }
-
+.chat-left-icon{
+	left: 80rpx; top: 20rpx;
+}
+.chat-right-icon{
+	right:80rpx;
+	top:20rpx;
+}
 

@@ -26,6 +26,7 @@
 					:index="index"
 					ref="chatItem"
 					@long="long"
+					@preview = "previewImages"
 					:pretime="index > 0 ? list[index - 1].create_time : 0"
 				></free-chat-item>
 			</view>
@@ -364,6 +365,16 @@ export default {
 				: [];
 			this.indicatorDots = (list.length > 1);
 			return list;
+		},
+		// 所以信息的图片地址
+		imageList(){
+			let arr = [];
+			this.list.forEach((item)=>{
+				if(item.type ==='emoticon' ||item.type ==='image'){
+					arr.push(item.data);
+				}
+			})
+			return arr;
 		}
 	},
 	watch: {
@@ -516,6 +527,13 @@ export default {
 					this.send('emoticon', e.icon);
 					break;
 			}
+		},
+		// 预览图片
+		previewImages(url){
+			uni.previewImage({
+				current:url,
+				urls:this.imageList,
+			})
 		}
 	}
 };

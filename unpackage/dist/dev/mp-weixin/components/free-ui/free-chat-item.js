@@ -183,6 +183,7 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 
 
+
 var _time = _interopRequireDefault(__webpack_require__(/*! @/common/free-lib/time.js */ 70));function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}var freeAvater = function freeAvater() {__webpack_require__.e(/*! require.ensure | components/free-ui/free-avater */ "components/free-ui/free-avater").then((function () {return resolve(__webpack_require__(/*! @/components/free-ui/free-avater.vue */ 87));}).bind(null, __webpack_require__)).catch(__webpack_require__.oe);};var _default =
 
 
@@ -243,6 +244,14 @@ var _time = _interopRequireDefault(__webpack_require__(/*! @/common/free-lib/tim
     });
   },
   methods: {
+    // 预览图片
+    preview: function preview(url) {
+      this.$emit('preview', url);
+      // uni.previewImage({
+      // 	current:url,
+      // 	urls:[url]
+      // })
+    },
     // 长按事件
     long: function long(e) {
       var x = 0;

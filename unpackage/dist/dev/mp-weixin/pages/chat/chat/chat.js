@@ -333,6 +333,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+
 {
   components: {
     freeNavBar: freeNavBar,
@@ -540,6 +541,16 @@ __webpack_require__.r(__webpack_exports__);
       [];
       this.indicatorDots = list.length > 1;
       return list;
+    },
+    // 所以信息的图片地址
+    imageList: function imageList() {
+      var arr = [];
+      this.list.forEach(function (item) {
+        if (item.type === 'emoticon' || item.type === 'image') {
+          arr.push(item.data);
+        }
+      });
+      return arr;
     } },
 
   watch: {
@@ -691,6 +702,13 @@ __webpack_require__.r(__webpack_exports__);
         case 'sendEmoticon': //发送表情包
           this.send('emoticon', e.icon);
           break;}
+
+    },
+    // 预览图片
+    previewImages: function previewImages(url) {
+      uni.previewImage({
+        current: url,
+        urls: this.imageList });
 
     } } };exports.default = _default;
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))

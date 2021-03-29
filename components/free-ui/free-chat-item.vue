@@ -49,6 +49,7 @@
 					style="width: 300rpx; height: 300rpx;"
 					mode="widthFix"
 					class="rounded"
+					@click="preview(item.data)"
 				></image>
 			</div>
 			<!-- 本人 -->
@@ -127,6 +128,14 @@ export default {
 		});
 	},
 	methods: {
+		// 预览图片
+		preview(url){
+			this.$emit('preview',url);
+			// uni.previewImage({
+			// 	current:url,
+			// 	urls:[url]
+			// })
+		},
 		// 长按事件
 		long(e) {
 			let x = 0;

@@ -221,6 +221,9 @@ var _default =
 
   methods: {
     show: function show() {var x = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : -1;var y = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : -1;
+      if (this.status) {
+        return;
+      }
       this.x = x > this.maxX ? this.maxX : x;
       this.y = y > this.maxY ? this.maxY : y;
       this.status = true;

@@ -183,16 +183,6 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 
 
-
-
-
-
-
-
-
-
-
-
 var _time = _interopRequireDefault(__webpack_require__(/*! @/common/free-lib/time.js */ 70));function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}var freeAvater = function freeAvater() {__webpack_require__.e(/*! require.ensure | components/free-ui/free-avater */ "components/free-ui/free-avater").then((function () {return resolve(__webpack_require__(/*! @/components/free-ui/free-avater.vue */ 87));}).bind(null, __webpack_require__)).catch(__webpack_require__.oe);};var _default =
 
 
@@ -216,20 +206,21 @@ var _time = _interopRequireDefault(__webpack_require__(/*! @/common/free-lib/tim
     },
     // 显示的时间
     showTime: function showTime() {
-      return _time.default.getChatTime(
-      this.item.create_time,
-      this.pretime);
-
+      return _time.default.getChatTime(this.item.create_time, this.pretime);
+    },
+    //是否需要气泡样式
+    hasLabelClass: function hasLabelClass() {
+      return this.item.type === 'text' || this.item.type === "aduio";
+    },
+    // 气泡的样式
+    labelClass: function labelClass() {
+      var label = this.hasLabelClass ? 'bg-chat-item mr-3' : 'mr-3';
+      return this.isselft ? label : 'bg-white ml-3';
     } },
 
   mounted: function mounted() {
-    this.$watch(
-    'item.isremove',
-    function (newVal, oldVal) {
+    this.$watch('item.isremove', function (newVal, oldVal) {
       if (newVal) {
-
-
-
 
 
 
@@ -250,7 +241,6 @@ var _time = _interopRequireDefault(__webpack_require__(/*! @/common/free-lib/tim
 
       }
     });
-
   },
   methods: {
     // 长按事件

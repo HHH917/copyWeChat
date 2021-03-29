@@ -13,6 +13,7 @@
 			:show-scrollbar="false"
 			:scroll-into-view="scrollIntoView"
 			:scroll-with-animation="true"
+			@click="clickPage"
 		>
 			<!-- 聊天信息列表组件 -->
 			<view
@@ -29,6 +30,15 @@
 				></free-chat-item>
 			</view>
 		</scroll-view>
+		<!-- #ifdef APP-NVUE -->
+		<div
+			v-if="mode === 'action' || mode === 'emoticon'"
+			class="position-fixed top-0 right-0 left-0 bottom-0"
+			:style="'bottom:' + maskBottom + 'px'"
+			@click="clickPage"
+		></div>
+		<!-- #endif -->
+
 		<!-- 底部输入框 -->
 		<view
 			class="position-fixed left-0 right-0  border-top flex align-center "
@@ -43,16 +53,20 @@
 					style="height: 80rpx; width: auto;"
 					:adjust-position="false"
 					v-model="text"
+					@focus="mode = 'text'"
 				/>
 			</view>
 			<!-- 表情 -->
-			<free-icon-button :icon="'\ue605'"></free-icon-button>
+			<free-icon-button
+				:icon="'\ue605'"
+				@click="openActionOrEmoticon('emoticon')"
+			></free-icon-button>
 
 			<template v-if="text.length === 0">
 				<!-- 扩展菜单 -->
 				<free-icon-button
 					:icon="'\ue603'"
-					@click="openAction"
+					@click="openActionOrEmoticon('action')"
 				></free-icon-button>
 			</template>
 			<template v-else>
@@ -72,26 +86,36 @@
 			bottom
 			transformOrigin="center bottom"
 			@hide="KeyboardHeight = 0"
+			:mask="false"
 		>
 			<view
 				style="height: 580rpx;"
 				class="border-top border-light-secondary bg-light"
 			>
-				<swiper :indicator-dots="true" style="height: 510rpx;">
-					<swiper-item class="row" v-for="(item,index) in actionList" :key='index'>
+				<swiper
+					:indicator-dots="indicatorDots"
+					style="height: 510rpx;"
+				>
+					<swiper-item
+						class="row"
+						v-for="(item, index) in emoticonOrAcitonList"
+						:key="index"
+					>
 						<view
 							class="col-3 flex flex-column align-center justify-center"
 							style="height:255rpx;"
-							v-for="(item2,index2) in item"
+							v-for="(item2, index2) in item"
 							:key="index2"
-							@click="actionEvent(item2.name)"
+							@click="actionEvent(item2)"
 						>
 							<image
 								:src="item2.icon"
 								mode="widthFix"
 								style="width:100rpx;height: 100rpx;"
 							></image>
-							<text class="font-sm text-muted mt-2">{{item2.name}}</text>
+							<text class="font-sm text-muted mt-2">
+								{{ item2.name }}
+							</text>
 						</view>
 					</swiper-item>
 				</swiper>
@@ -143,7 +167,7 @@ export default {
 	data() {
 		return {
 			//模式 text 输入文字 emoitcon表情 action 操作 audio音频
-			mode:"text",
+			mode: 'text',
 			// 扩展菜单列表
 			actionList: [
 				[
@@ -177,39 +201,16 @@ export default {
 						icon: '/static/images/extends/path.png',
 						event: ''
 					}
-				],
-				[
-					{
-						name: '相册',
-						icon: '/static/images/extends/pic.png',
-						event: ''
-					},
-					{
-						name: '拍摄',
-						icon: '/static/images/extends/video.png',
-						event: ''
-					},
-					{
-						name: '收藏',
-						icon: '/static/images/extends/shoucan.png',
-						event: ''
-					},
-					{
-						name: '名片',
-						icon: '/static/images/extends/man.png',
-						event: ''
-					},
-					{
-						name: '语音通话',
-						icon: '/static/images/extends/phone.png',
-						event: ''
-					},
-					{
-						name: '位置',
-						icon: '/static/images/extends/path.png',
-						event: ''
-					}
 				]
+			],
+			emoticonList: [
+				// [
+				// 	{
+				// 		name: '沮丧',
+				// 		icon: '/static/images/emoticon/5497/0.gif',
+				// 		event: ''
+				// 	}
+				// ]
 			],
 			//键盘高度
 			KeyboardHeight: 0,
@@ -239,7 +240,10 @@ export default {
 					event: 'removeChatItem'
 				}
 			],
+
 			scrollIntoView: '',
+			// 是否显示指示灯
+			indicatorDots:true, 
 			// 当前操作的气泡索引
 			propIndex: -1,
 			navBarHeight: 0,
@@ -288,6 +292,7 @@ export default {
 					isremove: false
 				}
 			],
+
 			text: '' //输入文字
 		};
 	},
@@ -299,16 +304,26 @@ export default {
 
 		// 监听键盘高度变化
 		uni.onKeyboardHeightChange(res => {
-			if(this.mode !== 'action'){
+			// 修复@foucus 事件触发比 onKeyboardHeightChange键盘高度变化监听慢的bug;
+			if (res.height > 0) {
+				this.mode = 'text';
+			}
+			if (this.mode !== 'action' && this.mode !== 'emoticon') {
 				this.KeyboardHeight = res.height;
 			}
-			
+
 			if (this.KeyboardHeight > 0) {
 				this.pageToBottom();
 			}
 		});
+		this.pageToBottom();
 	},
 	computed: {
+		// 动态获取蒙版的位置
+		maskBottom() {
+			return this.KeyboardHeight + uni.upx2px(105);
+		},
+
 		// 动态获取菜单高度
 		getMenusHeight() {
 			let H = 100;
@@ -341,26 +356,79 @@ export default {
 			return `bottom:${uni.upx2px(105) + this.KeyboardHeight}px;top:${
 				this.navBarHeight
 			}px;`;
+		},
+		// 获取操作或者表情列表
+		emoticonOrAcitonList() {
+			let list = this.mode === 'emoticon' || this.mode === 'action'
+				? this[this.mode + 'List']
+				: [];
+			this.indicatorDots = (list.length > 1);
+			return list;
 		}
 	},
+	watch: {
+		mode(newValue, oldValue) {
+			if (newValue !== 'action' && newValue !== 'emoticon') {
+				this.$refs.action.hide();
+			}
+			if (newValue !== 'text') {
+				uni.hideKeyboard();
+			}
+		}
+	},
+	created() {
+		// 初始化
+		this.__init();
+	},
 	methods: {
-		// 打开扩展菜单
-		openAction() {
-			this.mode = "action";
+		__init() {
+			let total = 20;
+			let page = Math.ceil(total / 8);
+			var arr = [];
+			for (let i = 0; i < page; i++) {
+				let start = i * 8;
+				arr[i] = [];
+				for (let j = 0; j < 8; j++) {
+					let no = start + j;
+					if (no + 1 > total) {
+						break;
+					}
+					arr[i].push({
+						name: '表情' + (start + j),
+						icon:
+							'/static/images/emoticon/5497/' +
+							(start + j) +
+							'.gif',
+						event: 'sendEmoticon'
+					});
+				}
+			}
+			this.emoticonList = arr;
+		},
+		// 打开扩展菜单或者表情包
+		openActionOrEmoticon(mode = 'action') {
+			this.mode = mode;
 			this.$refs.action.show();
-			
 			// 收起键盘
-			uni.hideKeyboard()
-			
+			uni.hideKeyboard();
 			this.KeyboardHeight = uni.upx2px(580);
 		},
+		// 点击页面区域
+		clickPage() {
+			this.mode = '';
+			// this.$refs.action.hide();
+		},
+		// 输入框聚焦
+		onInputFocus() {
+			this.mode = 'text';
+		},
 		// 发送
-		send(type) {
+		send(type, data = '') {
 			var obj = {
 				avatar: '/static/images/mail/friend.png',
 				user_id: 1,
 				nickname: '昵称',
-				type: 'text', //image,audio,video,file,share
+				type: type, //image,audio,video,file,share,emoticon
 				data: '',
 				create_time: new Date().getTime(),
 				isremove: false
@@ -369,7 +437,9 @@ export default {
 				case 'text':
 					obj.data = this.text;
 					break;
-				// default: break;
+				default:
+					obj.data = data;
+					break;
 			}
 			this.list.push(obj);
 			// 发送文字成功,清空输入框
@@ -380,8 +450,9 @@ export default {
 			this.pageToBottom();
 		},
 		// 回到底部
+		
 		pageToBottom() {
-			setTimeout(() => {
+		  let timer = 	setTimeout(() => {
 				// #ifdef APP-NVUE
 				let chatItem = this.$refs.chatItem;
 				let lastIndex = chatItem.length > 0 ? chatItem.length - 1 : 0;
@@ -396,7 +467,8 @@ export default {
 				let lastIndex = this.list.length - 1;
 				this.scrollIntoView = 'chatItem_' + lastIndex;
 				// #endif
-			}, 300);
+				clearTimeout(timer);
+			}, 200);
 		},
 		// 长按气泡消息
 		long({ x, y, index }) {
@@ -424,11 +496,25 @@ export default {
 			this.$refs.extend.hide();
 		},
 		//扩展菜单
-		actionEvent(e){
-			switch(e){
-				case 'uploadImage':
-				console.log("上传图片");
-				break;
+		actionEvent(e) {
+			switch (e.event) {
+				case 'uploadImage': // 选择相册
+					uni.chooseImage({
+						count:9,
+						success:(res) =>{
+							console.log(res.tempFilePaths);
+							// 发送到服务器
+							
+							// 渲染到页面
+							res.tempFilePaths.forEach((item	)=>{
+								this.send('image',item);
+							})
+						}
+					})
+					break;
+				case 'sendEmoticon': //发送表情包
+					this.send('emoticon', e.icon);
+					break;
 			}
 		}
 	}

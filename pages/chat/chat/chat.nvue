@@ -26,7 +26,7 @@
 					:index="index"
 					ref="chatItem"
 					@long="long"
-					@preview = "previewImages"
+					@preview="previewImages"
 					:pretime="index > 0 ? list[index - 1].create_time : 0"
 				></free-chat-item>
 			</view>
@@ -93,10 +93,7 @@
 				style="height: 580rpx;"
 				class="border-top border-light-secondary bg-light"
 			>
-				<swiper
-					:indicator-dots="indicatorDots"
-					style="height: 510rpx;"
-				>
+				<swiper :indicator-dots="indicatorDots" style="height: 510rpx;">
 					<swiper-item
 						class="row"
 						v-for="(item, index) in emoticonOrAcitonList"
@@ -244,7 +241,7 @@ export default {
 
 			scrollIntoView: '',
 			// 是否显示指示灯
-			indicatorDots:true, 
+			indicatorDots: true,
 			// 当前操作的气泡索引
 			propIndex: -1,
 			navBarHeight: 0,
@@ -289,6 +286,47 @@ export default {
 					type: 'text', //image,audio,video,file,share
 					data:
 						'你好,ヽ(*^ｰ^)人(^ｰ^*)ノ你好,ヽ(*^ｰ^)人(^ｰ^*)ノ你好,ヽ(*^ｰ^)人(^ｰ^*)ノ你好,ヽ(*^ｰ^)人(^ｰ^*)ノ',
+					create_time: 1616742034,
+					isremove: false
+				},
+				{
+					avatar: '/static/images/mail/friend.png',
+					user_id: 2,
+					nickname: '昵称',
+					type: 'audio', //image,audio,video,file,share
+					data:'/static/audio/1.mp3',
+					create_time: 1616742034,
+					isremove: false
+				},
+				
+				{
+					avatar: '/static/images/mail/friend.png',
+					user_id: 1,
+					nickname: '昵称',
+					type: 'audio', //image,audio,video,file,share
+					data:'/static/audio/2.mp3',
+					create_time: 1616742034,
+					isremove: false
+				},
+				{
+					avatar: '/static/images/mail/friend.png',
+					user_id: 2,
+					nickname: '昵称',
+					type: 'audio', //image,audio,video,file,share
+					data:'/static/audio/3.mp3',
+					create_time: 1616742034,
+					isremove: false
+				},
+				
+				{
+					avatar: '/static/images/mail/friend.png',
+					user_id: 2,
+					nickname: '昵称',
+					type: 'video', //image,audio,video,file,share
+					data:'/static/video/demo.mp4',
+					options:{
+						poster:"/static/video/demo.jpg"
+					},
 					create_time: 1616742034,
 					isremove: false
 				}
@@ -360,20 +398,21 @@ export default {
 		},
 		// 获取操作或者表情列表
 		emoticonOrAcitonList() {
-			let list = this.mode === 'emoticon' || this.mode === 'action'
-				? this[this.mode + 'List']
-				: [];
-			this.indicatorDots = (list.length > 1);
+			let list =
+				this.mode === 'emoticon' || this.mode === 'action'
+					? this[this.mode + 'List']
+					: [];
+			this.indicatorDots = list.length > 1;
 			return list;
 		},
 		// 所以信息的图片地址
-		imageList(){
+		imageList() {
 			let arr = [];
-			this.list.forEach((item)=>{
-				if(item.type ==='emoticon' ||item.type ==='image'){
+			this.list.forEach(item => {
+				if (item.type === 'emoticon' || item.type === 'image') {
 					arr.push(item.data);
 				}
-			})
+			});
 			return arr;
 		}
 	},
@@ -461,9 +500,9 @@ export default {
 			this.pageToBottom();
 		},
 		// 回到底部
-		
+
 		pageToBottom() {
-		  let timer = 	setTimeout(() => {
+			let timer = setTimeout(() => {
 				// #ifdef APP-NVUE
 				let chatItem = this.$refs.chatItem;
 				let lastIndex = chatItem.length > 0 ? chatItem.length - 1 : 0;
@@ -511,17 +550,17 @@ export default {
 			switch (e.event) {
 				case 'uploadImage': // 选择相册
 					uni.chooseImage({
-						count:9,
-						success:(res) =>{
+						count: 9,
+						success: res => {
 							console.log(res.tempFilePaths);
 							// 发送到服务器
-							
+
 							// 渲染到页面
-							res.tempFilePaths.forEach((item	)=>{
-								this.send('image',item);
-							})
+							res.tempFilePaths.forEach(item => {
+								this.send('image', item);
+							});
 						}
-					})
+					});
 					break;
 				case 'sendEmoticon': //发送表情包
 					this.send('emoticon', e.icon);
@@ -529,11 +568,12 @@ export default {
 			}
 		},
 		// 预览图片
-		previewImages(url){
+		previewImages(url) {
 			uni.previewImage({
-				current:url,
-				urls:this.imageList,
-			})
+				current: url,
+				urls: this.imageList,
+				indicator: 'default'
+			});
 		}
 	}
 };

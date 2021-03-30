@@ -114,7 +114,7 @@ __webpack_require__.r(__webpack_exports__);
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;
+/* WEBPACK VAR INJECTION */(function(uni) {Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;
 
 
 
@@ -184,13 +184,60 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 
 
-var _time = _interopRequireDefault(__webpack_require__(/*! @/common/free-lib/time.js */ 70));function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}var freeAvater = function freeAvater() {__webpack_require__.e(/*! require.ensure | components/free-ui/free-avater */ "components/free-ui/free-avater").then((function () {return resolve(__webpack_require__(/*! @/components/free-ui/free-avater.vue */ 87));}).bind(null, __webpack_require__)).catch(__webpack_require__.oe);};var _default =
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var _time = _interopRequireDefault(__webpack_require__(/*! @/common/free-lib/time.js */ 70));
+var _vuex = __webpack_require__(/*! vuex */ 137);function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}function ownKeys(object, enumerableOnly) {var keys = Object.keys(object);if (Object.getOwnPropertySymbols) {var symbols = Object.getOwnPropertySymbols(object);if (enumerableOnly) symbols = symbols.filter(function (sym) {return Object.getOwnPropertyDescriptor(object, sym).enumerable;});keys.push.apply(keys, symbols);}return keys;}function _objectSpread(target) {for (var i = 1; i < arguments.length; i++) {var source = arguments[i] != null ? arguments[i] : {};if (i % 2) {ownKeys(Object(source), true).forEach(function (key) {_defineProperty(target, key, source[key]);});} else if (Object.getOwnPropertyDescriptors) {Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));} else {ownKeys(Object(source)).forEach(function (key) {Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));});}}return target;}function _defineProperty(obj, key, value) {if (key in obj) {Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true });} else {obj[key] = value;}return obj;}var freeAvater = function freeAvater() {__webpack_require__.e(/*! require.ensure | components/free-ui/free-avater */ "components/free-ui/free-avater").then((function () {return resolve(__webpack_require__(/*! @/components/free-ui/free-avater.vue */ 87));}).bind(null, __webpack_require__)).catch(__webpack_require__.oe);};var freeImage = function freeImage() {__webpack_require__.e(/*! require.ensure | components/free-ui/free-image */ "components/free-ui/free-image").then((function () {return resolve(__webpack_require__(/*! @/components/free-ui/free-image.vue */ 116));}).bind(null, __webpack_require__)).catch(__webpack_require__.oe);};var _default =
 
 
 
 {
   components: {
-    freeAvater: freeAvater },
+    freeAvater: freeAvater,
+    freeImage: freeImage },
 
   props: {
     item: Object,
@@ -198,7 +245,21 @@ var _time = _interopRequireDefault(__webpack_require__(/*! @/common/free-lib/tim
     // 上一条消息的时间戳
     pretime: [Number, String] },
 
-  computed: {
+  data: function data() {
+    return {
+      innerAudioContext: null,
+      audioPlaying: false,
+      // 默认封面的宽高
+      poster: {
+        w: 100,
+        h: 100 } };
+
+
+  },
+  computed: _objectSpread(_objectSpread({},
+  (0, _vuex.mapState)({
+    ceshi: function ceshi(state) {return state.audio.ceshi;} })), {}, {
+
     //是否是本人
     isselft: function isselft() {
       // 获取本人id (假设拿到了)
@@ -211,15 +272,25 @@ var _time = _interopRequireDefault(__webpack_require__(/*! @/common/free-lib/tim
     },
     //是否需要气泡样式
     hasLabelClass: function hasLabelClass() {
-      return this.item.type === 'text' || this.item.type === "aduio";
+      return this.item.type === 'text' || this.item.type === 'aduio';
     },
     // 气泡的样式
     labelClass: function labelClass() {
       var label = this.hasLabelClass ? 'bg-chat-item mr-3' : 'mr-3';
       return this.isselft ? label : 'bg-white ml-3';
-    } },
+    },
+    // 短视频封面图标位置
+    posterIconStyle: function posterIconStyle() {
+      var w = this.poster.w / 2 - uni.upx2px(80) / 2;
+      var h = this.poster.h / 2 - uni.upx2px(80) / 2;
+      return "left:".concat(w, "px;top:").concat(h, "px;");
+    } }),
 
   mounted: function mounted() {
+    // 注册全局事件
+    if (this.item.type === 'audio') {
+      this.audioOn(this.onPlayAudio);
+    }
     this.$watch('item.isremove', function (newVal, oldVal) {
       if (newVal) {
 
@@ -243,7 +314,64 @@ var _time = _interopRequireDefault(__webpack_require__(/*! @/common/free-lib/tim
       }
     });
   },
-  methods: {
+  // 组件销毁
+  destroyed: function destroyed() {
+    if (this.item.type === 'audio') {
+      this.audioOff(this.onPlayAudio);
+    }
+    //销毁音频
+    if (this.innerAudioContext) {
+      this.innerAudioContext.destroy();
+      this.innerAudioContext = null;
+    }
+  },
+  methods: _objectSpread(_objectSpread({},
+  (0, _vuex.mapActions)(['audioOn', 'audioEmit', 'audioOff'])), {}, {
+    // 加载封面
+    loadPoster: function loadPoster(e) {
+      this.poster.w = e.w;
+      this.poster.h = e.h;
+
+    },
+    // 监听播放音频的全局事件
+    onPlayAudio: function onPlayAudio(index) {
+      // 如果不是当前索引下的音频 停止播放
+      if (this.innerAudioContext) {
+        if (this.index !== index) {
+          this.innerAudioContext.stop();
+        }
+      }
+    },
+    // 播放音频
+    openAudio: function openAudio() {var _this = this;
+      // 通知停止其他音频
+      this.audioEmit(this.index);
+      if (!this.innerAudioContext) {
+        this.innerAudioContext = uni.createInnerAudioContext();
+        this.innerAudioContext.src = this.item.data;
+        this.innerAudioContext.play();
+
+        // 监听播放
+        this.innerAudioContext.onPlay(function () {
+          _this.audioPlaying = true;
+        });
+        // 监听暂停
+        this.innerAudioContext.onPause(function () {
+          _this.audioPlaying = false;
+        });
+        // 监听停止
+        this.innerAudioContext.onStop(function () {
+          _this.audioPlaying = false;
+        });
+        // 监听错误
+        this.innerAudioContext.onError(function () {
+          _this.audioPlaying = false;
+        });
+      } else {
+        this.innerAudioContext.stop();
+        this.innerAudioContext.play();
+      }
+    },
     // 预览图片
     preview: function preview(url) {
       this.$emit('preview', url);
@@ -279,7 +407,8 @@ var _time = _interopRequireDefault(__webpack_require__(/*! @/common/free-lib/tim
         index: this.index });
 
       console.log(e);
-    } } };exports.default = _default;
+    } }) };exports.default = _default;
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))
 
 /***/ }),
 

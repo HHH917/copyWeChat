@@ -331,9 +331,6 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-
-
-
 {
   components: {
     freeNavBar: freeNavBar,
@@ -466,6 +463,47 @@ __webpack_require__.r(__webpack_exports__);
         data:
         '你好,ヽ(*^ｰ^)人(^ｰ^*)ノ你好,ヽ(*^ｰ^)人(^ｰ^*)ノ你好,ヽ(*^ｰ^)人(^ｰ^*)ノ你好,ヽ(*^ｰ^)人(^ｰ^*)ノ',
         create_time: 1616742034,
+        isremove: false },
+
+      {
+        avatar: '/static/images/mail/friend.png',
+        user_id: 2,
+        nickname: '昵称',
+        type: 'audio', //image,audio,video,file,share
+        data: '/static/audio/1.mp3',
+        create_time: 1616742034,
+        isremove: false },
+
+
+      {
+        avatar: '/static/images/mail/friend.png',
+        user_id: 1,
+        nickname: '昵称',
+        type: 'audio', //image,audio,video,file,share
+        data: '/static/audio/2.mp3',
+        create_time: 1616742034,
+        isremove: false },
+
+      {
+        avatar: '/static/images/mail/friend.png',
+        user_id: 2,
+        nickname: '昵称',
+        type: 'audio', //image,audio,video,file,share
+        data: '/static/audio/3.mp3',
+        create_time: 1616742034,
+        isremove: false },
+
+
+      {
+        avatar: '/static/images/mail/friend.png',
+        user_id: 2,
+        nickname: '昵称',
+        type: 'video', //image,audio,video,file,share
+        data: '/static/video/demo.mp4',
+        options: {
+          poster: "/static/video/demo.jpg" },
+
+        create_time: 1616742034,
         isremove: false }],
 
 
@@ -536,7 +574,8 @@ __webpack_require__.r(__webpack_exports__);
     },
     // 获取操作或者表情列表
     emoticonOrAcitonList: function emoticonOrAcitonList() {
-      var list = this.mode === 'emoticon' || this.mode === 'action' ?
+      var list =
+      this.mode === 'emoticon' || this.mode === 'action' ?
       this[this.mode + 'List'] :
       [];
       this.indicatorDots = list.length > 1;
@@ -708,7 +747,8 @@ __webpack_require__.r(__webpack_exports__);
     previewImages: function previewImages(url) {
       uni.previewImage({
         current: url,
-        urls: this.imageList });
+        urls: this.imageList,
+        indicator: 'default' });
 
     } } };exports.default = _default;
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))

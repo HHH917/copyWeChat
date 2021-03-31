@@ -18,11 +18,11 @@
 		<!-- 气泡 -->
 		<view
 			v-else
-			:class="!isselft ? 'justify-start' : 'justify-end'"
+			:class="!isself ? 'justify-start' : 'justify-end'"
 			class="flex align-start  position-relative mb-3"
 		>
 			<!-- 好友 -->
-			<template v-if="!isselft">
+			<template v-if="!isself">
 				<free-avater size="70" :src="item.avatar"></free-avater>
 				<text
 					v-if="hasLabelClass"
@@ -36,6 +36,7 @@
 				:class="labelClass"
 				class=" p-2 rounded "
 				style="max-width:500rpx"
+				:style="labelStyle"
 			>
 				<!-- 文字 -->
 				<text v-if="item.type === 'text'" class="font-md">
@@ -59,7 +60,7 @@
 					@click="openAudio"
 				>
 					<image
-					v-if="isselft"
+						v-if="isself"
 						:src="
 							!audioPlaying
 								? '/static/audio/audio3.png'
@@ -68,9 +69,9 @@
 						style="width: 50rpx;height: 50rpx;"
 						class="mx-1"
 					></image>
-					<text class="font">4'</text>
+					<text class="font">{{ item.options.time + '"' }}</text>
 					<image
-					v-if="!isselft"
+						v-if="!isself"
 						:src="
 							!audioPlaying
 								? '/static/audio/audio3.png'
@@ -81,23 +82,30 @@
 					></image>
 				</view>
 				<!-- 视频 -->
-				<view v-else-if="item.type ==='video'"
-				class="position-relative rounded">
+				<view
+					v-else-if="item.type === 'video'"
+					class="position-relative rounded"
+					@click="openVideo"
+				>
 					<free-image
 						:src="item.options.poster"
 						imageClass="rounded"
 						:maxWidth="500"
 						:maxHeight="500"
-						@load='loadPoster'
+						@load="loadPoster"
 					></free-image>
-					<text class="iconfont text-white position-absolute"
-					 style="font-size: 80rpx; width: 80rpx;height: 80rpx;"
-					 :style="posterIconStyle">&#xe737;</text>
+					<text
+						class="iconfont text-white position-absolute"
+						style="font-size:80rpx;"
+						:style="posterIconStyle"
+					>
+						&#xe737;
+					</text>
 				</view>
 			</div>
 
 			<!-- 本人 -->
-			<template v-if="isselft">
+			<template v-if="isself">
 				<text
 					v-if="hasLabelClass"
 					class="iconfont text-chat-item font-md position-absolute chat-right-icon"
@@ -134,9 +142,9 @@ export default {
 			innerAudioContext: null,
 			audioPlaying: false,
 			// 默认封面的宽高
-			poster:{
-				w:100,
-				h:100
+			poster: {
+				w: 200,
+				h: 200
 			}
 		};
 	},
@@ -145,29 +153,42 @@ export default {
 			ceshi: state => state.audio.ceshi
 		}),
 		//是否是本人
-		isselft() {
+		isself() {
 			// 获取本人id (假设拿到了)
 			let id = 1;
 			return this.item.user_id === id;
 		},
+
 		// 显示的时间
 		showTime() {
 			return $Time.getChatTime(this.item.create_time, this.pretime);
 		},
 		//是否需要气泡样式
 		hasLabelClass() {
-			return this.item.type === 'text' || this.item.type === 'aduio';
+			return this.item.type === 'text' || this.item.type === 'audio';
 		},
 		// 气泡的样式
 		labelClass() {
-			let label = this.hasLabelClass ? 'bg-chat-item mr-3' : 'mr-3';
-			return this.isselft ? label : 'bg-white ml-3';
+			let label1 = this.hasLabelClass ? 'bg-chat-item mr-3' : 'mr-3';
+			let label2 = this.hasLabelClass ? 'bg-white ml-3' : 'ml-3';
+			return this.isself ? label1 : label2;
+		},
+		labelStyle() {
+			if (this.item.type === 'audio') {
+				let time = this.item.options.time || 0;
+				let width = parseInt(time) / (60 / 400);
+				width = width < 150 ? 150 : width;
+				return `width:${width}rpx;`;
+			}
 		},
 		// 短视频封面图标位置
-		posterIconStyle(){
-			let w = this.poster.w / 2 - uni.upx2px(80) / 2;
-			let h = this.poster.h / 2 - uni.upx2px(80) / 2;
-			return `left:${w}px;top:${h}px;`
+		posterIconStyle() {
+			// let w = this.poster.w / 2 - 80 / 2;
+			// let h = this.poster.h / 2 - 80 / 2;
+			let w = this.poster.w / 2;
+			let h = this.poster.h / 2;
+			console.log(w, this.poster);
+			return `left:${w}rpx;top:${h}rpx;transform: translate(-50%,-50%);`;
 		}
 	},
 	mounted() {
@@ -212,10 +233,10 @@ export default {
 	methods: {
 		...mapActions(['audioOn', 'audioEmit', 'audioOff']),
 		// 加载封面
-		loadPoster(e){
+		loadPoster(e) {
 			this.poster.w = e.w;
 			this.poster.h = e.h;
-			
+			console.log('加载封面', this.poster, e);
 		},
 		// 监听播放音频的全局事件
 		onPlayAudio(index) {
@@ -247,6 +268,11 @@ export default {
 				this.innerAudioContext.onStop(() => {
 					this.audioPlaying = false;
 				});
+				// 监听自然播放结束
+				this.innerAudioContext.onEnded(() => {
+					this.audioPlaying = false;
+				});
+				
 				// 监听错误
 				this.innerAudioContext.onError(() => {
 					this.audioPlaying = false;
@@ -291,12 +317,23 @@ export default {
 				index: this.index
 			});
 			console.log(e);
+		},
+		// 打开视频
+		openVideo() {
+			uni.navigateTo({
+				url: '/pages/chat/video/video?url=' + this.item.data
+			});
 		}
 	}
 };
 </script>
 
 <style scoped>
+@import '@/common/free.css';
+@import '@/common/common.css';
+/* #ifndef APP-PLUS-NVUE */
+@import '@/common/free-icon.css';
+/* #endif*/
 .chat-left-icon {
 	left: 80rpx;
 	top: 20rpx;
@@ -310,6 +347,5 @@ export default {
 	/* #ifdef APP-NVUE */
 	opacity: 0;
 	/* #endif */
-	
 }
 </style>

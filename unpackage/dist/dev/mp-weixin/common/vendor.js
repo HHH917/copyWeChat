@@ -801,7 +801,7 @@ function initData(vueOptions, context) {
     try {
       data = data.call(context); // 支持 Vue.prototype 上挂的数据
     } catch (e) {
-      if (Object({"NODE_ENV":"development","VUE_APP_NAME":"copyWeChat","VUE_APP_PLATFORM":"mp-weixin","BASE_URL":"/"}).VUE_APP_DEBUG) {
+      if (Object({"VUE_APP_NAME":"copyWeChat","VUE_APP_PLATFORM":"mp-weixin","NODE_ENV":"development","BASE_URL":"/"}).VUE_APP_DEBUG) {
         console.warn('根据 Vue 的 data 函数初始化小程序 data 失败，请尽量确保 data 函数中不访问 vm 对象，否则可能影响首次数据渲染速度。', data);
       }
     }
@@ -1857,7 +1857,7 @@ function normalizeComponent (
 
 /***/ }),
 
-/***/ 136:
+/***/ 11:
 /*!************************************************************!*\
   !*** E:/package/uniAPP添加设备(小程序)/copyWeChat/store/index.js ***!
   \************************************************************/
@@ -1866,8 +1866,8 @@ function normalizeComponent (
 
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var _vue = _interopRequireDefault(__webpack_require__(/*! vue */ 2));
-var _vuex = _interopRequireDefault(__webpack_require__(/*! vuex */ 137));
-var _audio = _interopRequireDefault(__webpack_require__(/*! @/store/modules/audio.js */ 138));function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}
+var _vuex = _interopRequireDefault(__webpack_require__(/*! vuex */ 12));
+var _audio = _interopRequireDefault(__webpack_require__(/*! @/store/modules/audio.js */ 13));function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}
 _vue.default.use(_vuex.default);var _default =
 new _vuex.default.Store({
   modules: {
@@ -1875,7 +1875,7 @@ new _vuex.default.Store({
 
 /***/ }),
 
-/***/ 137:
+/***/ 12:
 /*!********************************************!*\
   !*** ./node_modules/vuex/dist/vuex.esm.js ***!
   \********************************************/
@@ -2988,7 +2988,7 @@ var index = {
 
 /***/ }),
 
-/***/ 138:
+/***/ 13:
 /*!********************************************************************!*\
   !*** E:/package/uniAPP添加设备(小程序)/copyWeChat/store/modules/audio.js ***!
   \********************************************************************/
@@ -2996,12 +2996,44 @@ var index = {
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var _default = {
+/* WEBPACK VAR INJECTION */(function(uni) {Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var _default = {
   state: {
     // 存放全局事件
-    events: [] },
+    events: [],
+    //录音管理器
+    RECORD: null,
+    RecordTIMER: null,
+    RecordTime: 0,
+    sendVioce: null },
 
   mutations: {
+    // 初始化录音管理器
+    initRECORD: function initRECORD(state) {
+      state.RECORD = uni.getRecorderManager();
+      // 监听录音开始
+      state.RECORD.onStart(function () {
+        state.RecordTime = 0;
+        state.RecordTIMER = setInterval(function () {
+          state.RecordTime++;
+        }, 1000);
+      });
+
+      // 监听录音结束
+      state.RECORD.onStop(function (e) {
+        if (state.RecordTIMER) {
+          clearInterval(state.RecordTIMER);
+          state.RecordTIMER = null;
+        }
+        // 执行发送
+        if (typeof state.sendVioce === 'function') {
+          state.sendVioce(e.tempFilePath);
+        }
+      });
+    },
+    // 注册发送音频事件
+    regSendVoiceEvent: function regSendVoiceEvent(state, event) {
+      state.sendVioce = event;
+    },
     //注册全局事件
     regEvent: function regEvent(state, event) {
       console.log('注册全局事件');
@@ -3036,6 +3068,7 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
     audioOff: function audioOff(_ref3, event) {var commit = _ref3.commit;
       commit('removeEvent', event);
     } } };exports.default = _default;
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))
 
 /***/ }),
 
@@ -8565,7 +8598,7 @@ function type(obj) {
 
 function flushCallbacks$1(vm) {
     if (vm.__next_tick_callbacks && vm.__next_tick_callbacks.length) {
-        if (Object({"NODE_ENV":"development","VUE_APP_NAME":"copyWeChat","VUE_APP_PLATFORM":"mp-weixin","BASE_URL":"/"}).VUE_APP_DEBUG) {
+        if (Object({"VUE_APP_NAME":"copyWeChat","VUE_APP_PLATFORM":"mp-weixin","NODE_ENV":"development","BASE_URL":"/"}).VUE_APP_DEBUG) {
             var mpInstance = vm.$scope;
             console.log('[' + (+new Date) + '][' + (mpInstance.is || mpInstance.route) + '][' + vm._uid +
                 ']:flushCallbacks[' + vm.__next_tick_callbacks.length + ']');
@@ -8586,14 +8619,14 @@ function nextTick$1(vm, cb) {
     //1.nextTick 之前 已 setData 且 setData 还未回调完成
     //2.nextTick 之前存在 render watcher
     if (!vm.__next_tick_pending && !hasRenderWatcher(vm)) {
-        if(Object({"NODE_ENV":"development","VUE_APP_NAME":"copyWeChat","VUE_APP_PLATFORM":"mp-weixin","BASE_URL":"/"}).VUE_APP_DEBUG){
+        if(Object({"VUE_APP_NAME":"copyWeChat","VUE_APP_PLATFORM":"mp-weixin","NODE_ENV":"development","BASE_URL":"/"}).VUE_APP_DEBUG){
             var mpInstance = vm.$scope;
             console.log('[' + (+new Date) + '][' + (mpInstance.is || mpInstance.route) + '][' + vm._uid +
                 ']:nextVueTick');
         }
         return nextTick(cb, vm)
     }else{
-        if(Object({"NODE_ENV":"development","VUE_APP_NAME":"copyWeChat","VUE_APP_PLATFORM":"mp-weixin","BASE_URL":"/"}).VUE_APP_DEBUG){
+        if(Object({"VUE_APP_NAME":"copyWeChat","VUE_APP_PLATFORM":"mp-weixin","NODE_ENV":"development","BASE_URL":"/"}).VUE_APP_DEBUG){
             var mpInstance$1 = vm.$scope;
             console.log('[' + (+new Date) + '][' + (mpInstance$1.is || mpInstance$1.route) + '][' + vm._uid +
                 ']:nextMPTick');
@@ -8679,7 +8712,7 @@ var patch = function(oldVnode, vnode) {
     });
     var diffData = this.$shouldDiffData === false ? data : diff(data, mpData);
     if (Object.keys(diffData).length) {
-      if (Object({"NODE_ENV":"development","VUE_APP_NAME":"copyWeChat","VUE_APP_PLATFORM":"mp-weixin","BASE_URL":"/"}).VUE_APP_DEBUG) {
+      if (Object({"VUE_APP_NAME":"copyWeChat","VUE_APP_PLATFORM":"mp-weixin","NODE_ENV":"development","BASE_URL":"/"}).VUE_APP_DEBUG) {
         console.log('[' + (+new Date) + '][' + (mpInstance.is || mpInstance.route) + '][' + this._uid +
           ']差量更新',
           JSON.stringify(diffData));
@@ -9128,7 +9161,7 @@ module.exports = g;
 
 /***/ }),
 
-/***/ 69:
+/***/ 80:
 /*!***********************************************************************!*\
   !*** E:/package/uniAPP添加设备(小程序)/copyWeChat/common/mixin/free-base.js ***!
   \***********************************************************************/
@@ -9136,7 +9169,7 @@ module.exports = g;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var _time = _interopRequireDefault(__webpack_require__(/*! @/common/free-lib/time.js */ 70));function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}var _default =
+Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var _time = _interopRequireDefault(__webpack_require__(/*! @/common/free-lib/time.js */ 81));function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}var _default =
 {
   filters: {
     formatTime: function formatTime(value) {
@@ -9145,7 +9178,7 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 
-/***/ 70:
+/***/ 81:
 /*!*********************************************************************!*\
   !*** E:/package/uniAPP添加设备(小程序)/copyWeChat/common/free-lib/time.js ***!
   \*********************************************************************/

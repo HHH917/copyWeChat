@@ -1,9 +1,41 @@
 export  default {
 	state:{
 		// 存放全局事件
-		events:[]
+		events:[],
+		//录音管理器
+		RECORD:null,
+		RecordTIMER:null,
+		RecordTime:0,
+		sendVioce:null
 	},
 	mutations:{
+		// 初始化录音管理器
+		initRECORD(state){
+			state.RECORD =  uni.getRecorderManager();
+			// 监听录音开始
+			state.RECORD.onStart(()=>{
+				state.RecordTime = 0;
+				state.RecordTIMER = setInterval(()=>{
+					state.RecordTime++;
+				},1000)
+			})
+				
+			// 监听录音结束
+			state.RECORD.onStop(e => {
+				if(state.RecordTIMER){
+					clearInterval(state.RecordTIMER);
+					state.RecordTIMER = null;
+				}
+				// 执行发送
+				if(typeof state.sendVioce === 'function' ){
+					state.sendVioce(e.tempFilePath)
+				}
+			});
+		},
+		// 注册发送音频事件
+		regSendVoiceEvent(state,event){
+			state.sendVioce = event;
+		},
 		//注册全局事件
 		regEvent(state,event){
 			console.log('注册全局事件');

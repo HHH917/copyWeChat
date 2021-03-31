@@ -46,28 +46,28 @@
 					event: "delChat"
 				}],
 				list: [{
-						avatar: "/static/logo.png",
+						avatar: "/static/images/userpic.png",
 						nickName: "hhh",
 						update_time: 1601909635,
 						data: "吃了吗？世界",
 						noreadnum: 1,
 						istop: false,
 					}, {
-						avatar: "/static/logo.png",
+						avatar: "/static/images/userpic.png",
 						nickName: "hhh",
 						update_time: 1612409635,
 						data: "吃了吗？人类",
 						noreadnum: 1,
 						istop: true,
 					}, {
-						avatar: "/static/logo.png",
+						avatar: "/static/images/userpic.png",
 						nickName: "hhh",
 						update_time: 1612409635,
 						data: "吃了吗？世界",
 						noreadnum: 1,
 						istop: false,
 					}, {
-						avatar: "/static/logo.png",
+						avatar: "/static/images/userpic.png",
 						nickName: "hhh",
 						update_time: 1612409635,
 						data: "吃了吗？世界",

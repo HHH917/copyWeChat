@@ -17,7 +17,7 @@
 					</text>
 				</view>
 				<!-- 右边 -->
-				<view class="flex align-center">
+				<view  v-if="showRight" class="flex align-center">
 					<slot name="right">
 						<free-icon-button @click="search" :icon="'\ue6e3'"></free-icon-button>
 						<free-icon-button @click="openExtend" :icon="'\ue682'"></free-icon-button>
@@ -29,7 +29,7 @@
 		<!-- 占位 -->
 		<view v-if="fixed" :style="fixedStyle"></view>
 		<!-- 扩展菜单 -->
-		<free-popup ref="extend" :bodyWidth="320" :bodyHeight="525" bodyBgColor="bg-dark" transformOrigin="right top">
+		<free-popup  v-if="showRight" ref="extend" :bodyWidth="320" :bodyHeight="525" bodyBgColor="bg-dark" transformOrigin="right top">
 			<view class="flex flex-column" style="width: 240rpx; height:525rpx;">
 				<view class="flex-1 flex align-center" hover-class="bg-hover-dark" v-for="(item,index) in menus" :key="index"
 				 @click="clickEvent(item.event)">
@@ -65,6 +65,10 @@
 			bgColor:{
 				type:String,
 				default:"bg-light"
+			},
+			showRight:{
+				type:Boolean,
+				default:true
 			}
 		},
 		components: {

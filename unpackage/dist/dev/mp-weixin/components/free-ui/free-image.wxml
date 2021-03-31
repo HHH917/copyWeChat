@@ -1,1 +1,1 @@
-<image class="{{['rounded',imageClass]}}" style="{{(imageStyle)}}" src="{{src}}" lazy-load="{{true}}" data-event-opts="{{[['tap',[['$emit',['click']]]],['load',[['loadImage',['$event']]]]]}}" bindtap="__e" bindload="__e"></image>
+<image class="{{['rounded bg-hover-light',imageClass]}}" style="{{(imageStyle)}}" src="{{src}}" lazy-load="{{true}}" data-event-opts="{{[['tap',[['$emit',['click']]]],['load',[['loadImage',['$event']]]]]}}" bindtap="__e" bindload="__e"></image>

@@ -2,7 +2,7 @@
 	<div>
 		<!-- 导航栏 -->
 		<free-nav-bar title="HHH博客" :noreadnum="1" :fixed="true" showBack>
-			<free-icon-button slot="right" :icon="'\ue6fd'"></free-icon-button>
+			<free-icon-button slot="right" :icon="'\ue6fd'" @click="openChatSet"></free-icon-button>
 		</free-nav-bar>
 		<!-- 聊天内容区域 -->
 		<scroll-view
@@ -46,9 +46,33 @@
 			style="background-color: #f7f7f6;height: 105rpx;"
 			:style="'bottom:' + KeyboardHeight + 'px'"
 		>
-			<free-icon-button :icon="'\ue606'"></free-icon-button>
+			<free-icon-button
+				v-if="mode === 'audio'"
+				:icon="'\ue607'"
+				@click="changeVoiceOrText"
+			></free-icon-button>
+			<free-icon-button
+				v-else
+				:icon="'\ue606'"
+				@click="changeVoiceOrText"
+			></free-icon-button>
 			<view class="flex-1">
+				<view
+					v-if="mode === 'audio'"
+					class=" rounded flex align-center justify-center"
+					style="height: 80rpx;"
+					:class="isRecording ? 'bg-hover-light' : 'bg-white'"
+					@touchstart="voiceTouchStart"
+					@touchend="voiceTouchEnd"
+					@touchcancel="voiceTouchCancel"
+					@touchmove="voiceTouchMove"
+				>
+					<text class="font">
+						{{ isRecording ? '松开 结束' : '按住 说话' }}
+					</text>
+				</view>
 				<textarea
+					v-else
 					fixed
 					class=" bg-white rounded p-2"
 					style="height: 80rpx; width: auto;"
@@ -143,6 +167,26 @@
 				</view>
 			</view>
 		</free-popup>
+
+		<!-- 录音提示 -->
+		<view
+			v-if="isRecording"
+			class="position-fixed top-0 left-0 right-0 flex align-center justify-center"
+			style="bottom:105rpx;"
+		>
+			<view
+				class="rounded flex flex-column align-center justify-center"
+				style="background-color: rgba(0,0,0,0.5); width: 360rpx;height: 360rpx;"
+			>
+				<image
+					src="/static/audio/recording.gif"
+					style="width: 150rpx; height: 150rpx;"
+				></image>
+				<text class="font text-white mt-3">
+					{{ unRecord ? '松开手指,取消发送' : '手指上滑,取消发送' }}
+				</text>
+			</view>
+		</view>
 	</div>
 </template>
 
@@ -155,6 +199,7 @@ import freeNavBar from '@/components/free-ui/free-nav-bar.vue';
 import freeIconButton from '@/components/free-ui/free-icon-button.vue';
 import freeChatItem from '@/components/free-ui/free-chat-item.vue';
 import freePopup from '@/components/free-ui/free-popup.vue';
+import { mapState, mapMutations } from 'vuex';
 export default {
 	components: {
 		freeNavBar,
@@ -165,7 +210,7 @@ export default {
 	data() {
 		return {
 			//模式 text 输入文字 emoitcon表情 action 操作 audio音频
-			mode: 'text',
+			mode: 'audio',
 			// 扩展菜单列表
 			actionList: [
 				[
@@ -177,7 +222,7 @@ export default {
 					{
 						name: '拍摄',
 						icon: '/static/images/extends/video.png',
-						event: ''
+						event: 'uploadVideo'
 					},
 					{
 						name: '收藏',
@@ -244,8 +289,15 @@ export default {
 			indicatorDots: true,
 			// 当前操作的气泡索引
 			propIndex: -1,
+			// 音频录制状态
+			isRecording: false,
+			RecordingStartY: 0,
+			// 取消录音
+			unRecord: false,
+
 			navBarHeight: 0,
 			statusBarHeight: 0,
+
 			list: [
 				{
 					avatar: '/static/images/mail/friend.png',
@@ -294,38 +346,33 @@ export default {
 					user_id: 2,
 					nickname: '昵称',
 					type: 'audio', //image,audio,video,file,share
-					data:'/static/audio/1.mp3',
+					data: '/static/audio/1.mp3',
+					options: {
+						time: 10
+					},
 					create_time: 1616742034,
 					isremove: false
 				},
-				
-				{
-					avatar: '/static/images/mail/friend.png',
-					user_id: 1,
-					nickname: '昵称',
-					type: 'audio', //image,audio,video,file,share
-					data:'/static/audio/2.mp3',
-					create_time: 1616742034,
-					isremove: false
-				},
-				{
-					avatar: '/static/images/mail/friend.png',
-					user_id: 2,
-					nickname: '昵称',
-					type: 'audio', //image,audio,video,file,share
-					data:'/static/audio/3.mp3',
-					create_time: 1616742034,
-					isremove: false
-				},
-				
 				{
 					avatar: '/static/images/mail/friend.png',
 					user_id: 2,
 					nickname: '昵称',
 					type: 'video', //image,audio,video,file,share
-					data:'/static/video/demo.mp4',
-					options:{
-						poster:"/static/video/demo.jpg"
+					data: '/static/video/demo.mp4',
+					options: {
+						poster: '/static/video/demo.jpg'
+					},
+					create_time: 1616742034,
+					isremove: false
+				},
+				{
+					avatar: '/static/images/mail/friend.png',
+					user_id: 1,
+					nickname: '昵称',
+					type: 'video', //image,audio,video,file,share
+					data: '/static/video/demo.mp4',
+					options: {
+						poster: '/static/video/demo.jpg'
 					},
 					create_time: 1616742034,
 					isremove: false
@@ -356,8 +403,22 @@ export default {
 			}
 		});
 		this.pageToBottom();
+
+		// 注册发送音频事件
+		this.regSendVoiceEvent(url => {
+			if (!this.unRecord) {
+				//发送
+				this.send('audio', url, {
+					time: this.RecordTime
+				});
+			}
+		});
 	},
 	computed: {
+		...mapState({
+			RECORD: state => state.audio.RECORD,
+			RecordTime: state => state.audio.RecordTime
+		}),
 		// 动态获取蒙版的位置
 		maskBottom() {
 			return this.KeyboardHeight + uni.upx2px(105);
@@ -431,6 +492,7 @@ export default {
 		this.__init();
 	},
 	methods: {
+		...mapMutations(['regSendVoiceEvent']),
 		__init() {
 			let total = 20;
 			let page = Math.ceil(total / 8);
@@ -473,22 +535,20 @@ export default {
 			this.mode = 'text';
 		},
 		// 发送
-		send(type, data = '') {
+		send(type, data = '', options = {}) {
 			var obj = {
 				avatar: '/static/images/mail/friend.png',
 				user_id: 1,
 				nickname: '昵称',
 				type: type, //image,audio,video,file,share,emoticon
-				data: '',
+				data: data,
+				options: options,
 				create_time: new Date().getTime(),
 				isremove: false
 			};
 			switch (type) {
 				case 'text':
 					obj.data = this.text;
-					break;
-				default:
-					obj.data = data;
 					break;
 			}
 			this.list.push(obj);
@@ -562,6 +622,20 @@ export default {
 						}
 					});
 					break;
+				case 'uploadVideo': //发送视频
+					uni.chooseVideo({
+						maxDuration:60,
+						success: (res)=> {
+							// self.src = res.tempFilePath;
+							// 渲染页面
+							this.send('video', res.tempFilePath);
+							// 发送到服务端（获取视频封面，返回url）
+							// 修改本地的发送状态
+							
+						}
+					});
+					// this.send('emoticon', e.icon);
+					break;
 				case 'sendEmoticon': //发送表情包
 					this.send('emoticon', e.icon);
 					break;
@@ -574,6 +648,47 @@ export default {
 				urls: this.imageList,
 				indicator: 'default'
 			});
+		},
+		// 切换音频录制和文本输入
+		changeVoiceOrText() {
+			this.mode = this.mode !== 'audio' ? 'audio' : 'text';
+		},
+		// 录音相关
+		voiceTouchStart(e) {
+			//初始化
+			this.isRecording = true;
+			this.RecordingStartY =
+				e.changedTouches[0].screenY || e.changedTouches[0].pageY;
+			this.unRecord = false;
+			// 开始录音
+			this.RECORD.start({
+				format: 'mp3'
+			});
+		},
+		// 录音结束
+		voiceTouchEnd() {
+			this.isRecording = false;
+			// 停止录音
+			this.RECORD.stop();
+		},
+		// 录音被打断 取消发送
+		voiceTouchCancel() {
+			this.isRecording = false;
+			this.unRecord = true;
+			// 停止录音
+			this.RECORD.stop();
+		},
+		voiceTouchMove(e) {
+			let RecordingEndY =
+				e.changedTouches[0].screenY || e.changedTouches[0].pageY;
+			let Y = Math.abs(RecordingEndY - this.RecordingStartY);
+			this.unRecord = Y >= 60;
+		},
+		// 打开聊天信息设置
+		openChatSet(){
+			uni.navigateTo({
+				url:'../chat-set/chat-set'
+			})
 		}
 	}
 };

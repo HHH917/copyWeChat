@@ -3,7 +3,7 @@
 		:src="src"
 		lazy-load
 		:style="imageStyle"
-		class="rounded"
+		class="rounded bg-hover-light"
 		:class="imageClass"
 		@click="$emit('click')"
 		@load="loadImage"
@@ -32,8 +32,8 @@ export default {
 	},
 	data() {
 		return {
-			h: 100,
-			w: 100
+			h: 200,
+			w: 200
 		};
 	},
 	computed: {

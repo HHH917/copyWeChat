@@ -1,0 +1,50 @@
+<template>
+	<div class="page">
+		<!-- 导航栏 -->
+		<free-nav-bar showBack :showRight="true" bgColor='bg-white'>
+			<free-icon-button slot="right" :icon="'\ue6fd'" @click="openChatSet"></free-icon-button>
+		</free-nav-bar>
+		
+		<view class="px-3 py-4 flex align-center bg-white border-bottom">
+			<free-avater src='/static/tabbar/my-select.png' size="120"></free-avater>
+			<view class="flex flex-column ml-3">
+				<text class="font-lg font-weight-bold mb-1">昵称</text>
+				<text class="font-md text-light-muted">账号：HHH</text>
+				<text class="font-md text-light-muted">地区：广东阳江</text>
+				
+			</view>
+		</view>
+			
+		<free-list-item title="标签" showRight :showLeftIcon="false"></free-list-item>
+		<free-divider></free-divider>
+		<free-list-item title="朋友圈" showRight :showLeftIcon="false"></free-list-item>
+		<free-list-item title="更多信息" showRight :showLeftIcon="false"></free-list-item>
+		<free-divider></free-divider>
+		<view class="py-3 flex align-center justify-center bg-white" hover-class="bg-light">
+			<text class=" iconfont text-primary mr-1">&#xe64e;</text>
+			<text class="font-md text-primary">发信息</text>
+		</view>
+	</div>
+</template>
+
+<script>
+import freeNavBar from '@/components/free-ui/free-nav-bar.vue';
+import freeAvater from '@/components/free-ui/free-avater.vue';
+import freeDivider from '@/components/free-ui/free-divider.vue';
+import freeListItem from '@/components/free-ui/free-list-item.vue';
+import freeIconButton from '@/components/free-ui/free-icon-button.vue';
+export default {
+	components: {
+		freeNavBar,
+		freeAvater,
+		freeDivider,
+		freeListItem,
+		freeIconButton
+	},
+	data() {
+		return {};
+	}
+};
+</script>
+
+<style></style>

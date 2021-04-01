@@ -23,7 +23,8 @@
 		>
 			<!-- 好友 -->
 			<template v-if="!isself">
-				<free-avater size="70" :src="item.avatar"></free-avater>
+				<free-avater size="70" :src="item.avatar"
+				clickType="navigate"></free-avater>
 				<text
 					v-if="hasLabelClass"
 					class="iconfont text-white font-md position-absolute chat-left-icon"
@@ -112,7 +113,8 @@
 				>
 					&#xe640;
 				</text>
-				<free-avater size="70" :src="item.avatar"></free-avater>
+				<free-avater size="70" :src="item.avatar"
+				clickType="navigate"></free-avater>
 			</template>
 		</view>
 	</div>

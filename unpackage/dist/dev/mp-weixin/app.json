@@ -6,7 +6,8 @@
     "pages/tabbar/my/my",
     "pages/chat/chat/chat",
     "pages/chat/video/video",
-    "pages/chat/chat-set/chat-set"
+    "pages/chat/chat-set/chat-set",
+    "pages/mail/user-base/user-base"
   ],
   "subPackages": [],
   "window": {

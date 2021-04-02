@@ -1,29 +1,78 @@
 <template>
 	<div class="page">
 		<!-- 导航栏 -->
-		<free-nav-bar showBack :showRight="true" bgColor='bg-white'>
-			<free-icon-button slot="right" :icon="'\ue6fd'" @click="openChatSet"></free-icon-button>
+		<free-nav-bar showBack :showRight="true" bgColor="bg-white">
+			<free-icon-button slot="right" :icon="'\ue6fd'" @click="openAction"></free-icon-button>
 		</free-nav-bar>
-		
+
 		<view class="px-3 py-4 flex align-center bg-white border-bottom">
-			<free-avater src='/static/tabbar/my-select.png' size="120"></free-avater>
+			<free-avater src="/static/tabbar/my-select.png" size="120"></free-avater>
 			<view class="flex flex-column ml-3">
-				<text class="font-lg font-weight-bold mb-1">昵称</text>
+				<view class="flex align-center justify-between">
+					<text class="font-lg font-weight-bold mb-1">{{ nickname }}</text>
+					<image src="/static/images/star.png" style="width: 40rpx;"></image>
+				</view>
 				<text class="font-md text-light-muted">账号：HHH</text>
 				<text class="font-md text-light-muted">地区：广东阳江</text>
-				
 			</view>
 		</view>
-			
-		<free-list-item title="标签" showRight :showLeftIcon="false"></free-list-item>
+
+		<free-list-item showRight :showLeftIcon="false" @click="navigate('mail/user-remark-tag/user-remark-tag')">
+			<view class="flex align-center ">
+				<text class="font-md text-dark mr-3">标签</text>
+				<text class="font-md text-light-muted mr-2" v-for="(item, index) in tageList" :key="index">
+					{{ item }}
+				</text>
+				<text class="font-md text-light-muted mr-2" v-if="tageList.length < 1">未设置</text>
+			</view>
+		</free-list-item>
 		<free-divider></free-divider>
-		<free-list-item title="朋友圈" showRight :showLeftIcon="false"></free-list-item>
+		<free-list-item showRight :showLeftIcon="false">
+			<view class="flex align-center ">
+				<text class="font-md text-dark mr-3">朋友圈</text>
+				<image
+					src="/static/images/emoticon/5497/18.gif"
+					style="width: 90rpx; height: 90rpx;"
+					class=" mr-2"
+				></image>
+				<image
+					src="/static/images/emoticon/5497/18.gif"
+					style="width: 90rpx; height: 90rpx;"
+					class=" mr-2"
+				></image>
+				<image
+					src="/static/images/emoticon/5497/18.gif"
+					style="width: 90rpx; height: 90rpx;"
+					class=" mr-2"
+				></image>
+			</view>
+		</free-list-item>
 		<free-list-item title="更多信息" showRight :showLeftIcon="false"></free-list-item>
 		<free-divider></free-divider>
 		<view class="py-3 flex align-center justify-center bg-white" hover-class="bg-light">
 			<text class=" iconfont text-primary mr-1">&#xe64e;</text>
 			<text class="font-md text-primary">发信息</text>
 		</view>
+
+		<!-- 操作菜单 -->
+		<free-popup ref="action" bottom maskColor transformOrigin="center bottom">
+			<scroll-view
+				:show-scrollbar="false"
+				scroll-y="true"
+				style="height: 580rpx;"
+				class="bg-white hide-scrollbar"
+			>
+				<free-list-item
+					v-for="(item, index) in actions"
+					:key="index"
+					:title="item.title"
+					:border="false"
+					@click="popupEvent(item)"
+				>
+					<text slot="icon" class="iconfont font-lg py-1">{{ item.icon }}</text>
+				</free-list-item>
+			</scroll-view>
+		</free-popup>
 	</div>
 </template>
 
@@ -33,18 +82,101 @@ import freeAvater from '@/components/free-ui/free-avater.vue';
 import freeDivider from '@/components/free-ui/free-divider.vue';
 import freeListItem from '@/components/free-ui/free-list-item.vue';
 import freeIconButton from '@/components/free-ui/free-icon-button.vue';
+import freePopup from '@/components/free-ui/free-popup.vue';
 export default {
 	components: {
 		freeNavBar,
 		freeAvater,
 		freeDivider,
 		freeListItem,
-		freeIconButton
+		freeIconButton,
+		freePopup
 	},
 	data() {
-		return {};
+		return {
+			nickname: '昵称',
+			tageList: [],
+			actions: [
+				{
+					icon: '\ue6b3',
+					title: '设置备注和标签',
+					type: 'navigate',
+					path: 'mail/user-remark-tag/user-remark-tag'
+				},
+				{
+					icon: '\ue613',
+					title: '把他推荐给朋友'
+				},
+				{
+					icon: '\ue6b0',
+					title: '设为星标好友',
+					type:"event",
+					event:"setStar"
+				},
+				{
+					icon: '\ue667',
+					title: '设置朋友圈和动态权限',
+					type: 'navigate',
+					path: 'mail/user-moments-auth/user-moments-auth'
+				},
+				{
+					icon: '\ue638',
+					title: '加入黑名单'
+				},
+				{
+					icon: '\ue61c',
+					title: '投诉'
+				}
+			]
+		};
+	},
+	onLoad() {
+		uni.$on('saveRemarkTag', e => {
+			this.nickname = e.nickname;
+			this.tageList = e.tageList;
+		});
+	},
+	beforeDestroy() {
+		uni.$off('saveRemarkTag');
+	},
+	methods: {
+		// 打开操作菜单
+		openAction() {
+			this.$refs.action.show();
+		},
+		// 跳转
+		navigate(path) {
+			uni.navigateTo({
+				url: '/pages/' + path
+			});
+		},
+		// 操作菜单事件
+		popupEvent(e) {
+			if (!e.type) {
+				return;
+			}
+			switch (e.type) {
+				case 'navigate':
+					uni.navigateTo({
+						url: '/pages/' + e.path
+					}); break;
+				case 'event': {
+					this[e.event](e);break;
+				}
+			}
+		},
+		// 设为星标
+		setStar(e){
+			console.log(e);
+		}
 	}
 };
 </script>
 
-<style></style>
+<style>
+@import '@/common/free.css';
+@import '@/common/common.css';
+/* #ifndef APP-PLUS-NVUE */
+@import '@/common/free-icon.css';
+/* #endif*/
+</style>

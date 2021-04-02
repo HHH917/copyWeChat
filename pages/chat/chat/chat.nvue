@@ -7,7 +7,7 @@
 		<!-- 聊天内容区域 -->
 		<scroll-view
 			scroll-y="true"
-			class=" hiddenScrollbar bg-light position-fixed left-0 right-0 px-3"
+			class=" hide-scrollbar bg-light position-fixed left-0 right-0 px-3"
 			style="bottom: 105rpx;"
 			:style="chatBodyBottom"
 			:show-scrollbar="false"
@@ -96,13 +96,7 @@
 			</template>
 			<template v-else>
 				<!-- 发送按钮 -->
-				<view
-					class="main-bg-color  rounded mr-3 px-2 py-1"
-					hover-class=""
-					@click="send('text')"
-				>
-					<text class="font text-white ">发送</text>
-				</view>
+				<free-main-button name="发送" @click="send('text')"></free-main-button>
 			</template>
 		</view>
 		<!-- 扩展菜单弹出层 -->
@@ -199,13 +193,15 @@ import freeNavBar from '@/components/free-ui/free-nav-bar.vue';
 import freeIconButton from '@/components/free-ui/free-icon-button.vue';
 import freeChatItem from '@/components/free-ui/free-chat-item.vue';
 import freePopup from '@/components/free-ui/free-popup.vue';
+import freeMainButton from '@/components/free-ui/free-main-button.vue';
 import { mapState, mapMutations } from 'vuex';
 export default {
 	components: {
 		freeNavBar,
 		freeIconButton,
 		freeChatItem,
-		freePopup
+		freePopup,
+		freeMainButton
 	},
 	data() {
 		return {
@@ -701,9 +697,4 @@ export default {
 @import '@/common/free-icon.css';
 /* #endif*/
 
-.hiddenScrollbar ::-webkit-scrollbar {
-	width: 0;
-	height: 0;
-	color: transparent;
-}
 </style>

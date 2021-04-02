@@ -1,0 +1,83 @@
+<template>
+	<view class="page">
+		<!-- 导航栏 -->
+		<free-nav-bar title="设置备注和标签" showBack :showRight="true" bgColor="bg-white">
+			<free-main-button slot="right" name="完成" @click="submit"></free-main-button>
+		</free-nav-bar>
+		<view class="flex flex-column">
+			<text class="font-sm text-secondary px-3 py-2">备注名</text>
+			<input
+				type="text"
+				v-model="nickname"
+				class="font-md bg-white border px-3 "
+				placeholder="请填写备注名"
+				style="height: 100rpx;"
+				
+			/>
+		</view>
+		<view class="flex flex-column">
+			<text class="font-sm text-secondary px-3 py-2">标签</text>
+			<view @click="openTagSet" class="font-md bg-white border px-3 flex align-center flex-wrap py-3 pt-3 pb-2">
+				<view
+					v-for="(item, index) in tageList"
+					:key="index"
+					class="border border-main  rounded-circle px-2 py-1 mr-1 mb-1"
+				>
+					<text class="main-text-color font">{{ item }}</text>
+				</view>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script>
+import freeNavBar from '@/components/free-ui/free-nav-bar.vue';
+import userTagSet from '../user-tag-set/user-tag-set.nvue';
+import freeMainButton from '@/components/free-ui/free-main-button.vue';
+export default {
+	components: {
+		freeNavBar,
+		freeMainButton,
+		userTagSet
+	},
+	data() {
+		return {
+			nickname:'',
+			tageList: ['人才','^_^',"O(∩_∩)O"]
+		};
+	},
+	onLoad() {
+		uni.$on('updateTag',(e)=>{
+			this.tageList = e;
+		})
+	},
+	beforeDestroy() {
+		uni.$off('updateTag');
+	},
+	methods: {
+		openTagSet() {
+			uni.navigateTo({
+				url: '/pages/mail/user-tag-set/user-tag-set?detail=' + JSON.stringify(this.tageList)
+			});
+		},
+		// 完成
+		submit(){
+			uni.$emit('saveRemarkTag',{
+				nickname:this.nickname,
+				tageList:this.tageList
+			})
+			uni.navigateBack({
+				delta:1
+			})
+		}
+	}
+};
+</script>
+
+<style>
+@import '@/common/free.css';
+@import '@/common/common.css';
+/* #ifndef APP-PLUS-NVUE */
+@import '@/common/free-icon.css';
+/* #endif*/
+</style>

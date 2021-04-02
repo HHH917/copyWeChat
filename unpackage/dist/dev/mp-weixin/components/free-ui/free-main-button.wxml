@@ -1,0 +1,1 @@
+<view class="main-bg-color  rounded mr-3 px-2 py-1" hover-class data-event-opts="{{[['tap',[['$emit',['click']]]]]}}" bindtap="__e"><text class="font text-white ">{{name}}</text></view>

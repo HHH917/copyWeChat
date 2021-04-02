@@ -1,80 +1,83 @@
 {
-	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
-		{
-			"path": "pages/tabbar/index/index",
-			"style": {}
+		"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+			{
+				"path": "pages/tabbar/index/index",
+				"style": {}
+			}, {
+				"path": "pages/tabbar/mail/mail",
+				"style": {}
+			}, {
+				"path": "pages/tabbar/find/find",
+				"style": {}
+			}, {
+				"path": "pages/tabbar/my/my",
+				"style": {}
+			}, {
+				"path": "pages/chat/chat/chat",
+				"style": {}
+			}, {
+				"path": "pages/chat/video/video",
+				"style": {}
+			}, {
+				"path": "pages/chat/chat-set/chat-set",
+				"style": {}
+			}, {
+				"path": "pages/mail/user-base/user-base",
+				"style": {}
+			}, {
+				"path": "pages/mail/user-remark-tag/user-remark-tag",
+				"style": {}
+			}, {
+				"path": "pages/mail/user-tag-set/user-tag-set",
+				"style": {}
+			}
+		    ,{
+            "path" : "pages/mail/user-moments-auth/user-moments-auth",
+            "style" :                                                                                    
+            {
+            
+            }
+            
+        }
+    ],
+		"globalStyle": {
+			"navigationBarTextStyle": "black",
+			"navigationBarTitleText": "仿微信",
+			"navigationBarBackgroundColor": "#F8F8F8",
+			"backgroundColor": "#F8F8F8",
+			"app-plus": {
+				"titleNView": false, //禁用原生导航栏
+				"scrollIndicator": "none"
+			},
+			"rpxCalcMaxDeviceWidth": 960, // rpx 计算所支持的最大设备宽度，单位 px，默认值为 960
+			"rpxCalcBaseDeviceWidth": 375, // rpx 计算使用的基准设备宽度，设备实际宽度超出 rpx 计算所支持的最大设备宽度时将按基准宽度计算，单位 px，默认值为 375
+			"rpxCalcIncludeWidth": 750 // rpx 计算特殊处理的值，始终按实际的设备宽度计算，单位 rpx，默认值为 750
 		},
-		{
-			"path": "pages/tabbar/mail/mail",
-			"style": {}
-		},
-		{
-			"path": "pages/tabbar/find/find",
-			"style": {}
-		},
-		{
-			"path": "pages/tabbar/my/my",
-			"style": {}
-		}, {
-			"path": "pages/chat/chat/chat",
-			"style": {}
-		},
-		{
-			"path": "pages/chat/video/video",
-			"style": {}
-		},{
-			"path": "pages/chat/chat-set/chat-set",
-			"style": {}
-		},{
-			"path": "pages/mail/user-base/user-base",
-			"style": {}
-		}
-	],
-	"globalStyle": {
-		"navigationBarTextStyle": "black",
-		"navigationBarTitleText": "仿微信",
-		"navigationBarBackgroundColor": "#F8F8F8",
-		"backgroundColor": "#F8F8F8",
-		"app-plus": {
-			"titleNView": false, //禁用原生导航栏
-			"scrollIndicator": "none"
-		},
-		"rpxCalcMaxDeviceWidth": 960, // rpx 计算所支持的最大设备宽度，单位 px，默认值为 960
-		"rpxCalcBaseDeviceWidth": 375, // rpx 计算使用的基准设备宽度，设备实际宽度超出 rpx 计算所支持的最大设备宽度时将按基准宽度计算，单位 px，默认值为 375
-		"rpxCalcIncludeWidth": 750 // rpx 计算特殊处理的值，始终按实际的设备宽度计算，单位 rpx，默认值为 750
-	},
-	"tabBar": {
-		"borderStyle": "black",
-		"backgroundColor": "#F7F7F7",
-		"color": "#000000",
-		"selectedColor": "#98c261",
-		"list": [{
+		"tabBar": {
+			"borderStyle": "black",
+			"backgroundColor": "#F7F7F7",
+			"color": "#000000",
+			"selectedColor": "#98c261",
+			"list": [{
 				"iconPath": "static/tabbar/index.png",
 				"selectedIconPath": "static/tabbar/index-select.png",
 				"pagePath": "pages/tabbar/index/index",
 				"text": "首页"
-			},
-
-			{
+			}, {
 				"iconPath": "static/tabbar/mail.png",
 				"selectedIconPath": "static/tabbar/mail-select.png",
 				"pagePath": "pages/tabbar/mail/mail",
 				"text": "通讯录"
-			},
-			{
+			}, {
 				"iconPath": "static/tabbar/find.png",
 				"selectedIconPath": "static/tabbar/find-select.png",
 				"pagePath": "pages/tabbar/find/find",
 				"text": "发现"
-			},
-			{
+			}, {
 				"iconPath": "static/tabbar/my.png",
 				"selectedIconPath": "static/tabbar/my-select.png",
 				"pagePath": "pages/tabbar/my/my",
 				"text": "我的"
-			}
-		]
-
+			}]
+		}
 	}
-
-}
